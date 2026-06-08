@@ -1,0 +1,11 @@
+{
+    "nb_zones": 4,
+    "nb_capteurs": 5,
+    "capteurs": [
+        {"zones": [0, 1],    "duree_vie": 8},
+        {"zones": [1, 2],    "duree_vie": 5},
+        {"zones": [2, 3],    "duree_vie": 4},
+        {"zones": [0, 3],    "duree_vie": 7},
+        {"zones": [0, 1, 2], "duree_vie": 3}
+    ]
+}
