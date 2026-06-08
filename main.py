@@ -13,7 +13,7 @@ import argparse
 import os
 import sys
 
-from data import instance_exemple, lire_depuis_fichier, generer_aleatoire, Instance
+from data import instance_exemple, lire_depuis_fichier, lire_depuis_fichier_texte, generer_aleatoire, Instance
 from configs import generer_configurations, afficher_configurations
 from solver import resoudre, afficher_solution
 from experiences import lancer_experiences
@@ -42,6 +42,8 @@ def parse_args():
         description="Problème d'activation de capteurs pour surveillance de zones"
     )
     parser.add_argument("--fichier",    type=str, help="Chemin vers un fichier JSON d'instance")
+    parser.add_argument("--fichier-txt", type=str, metavar="CHEMIN",
+                        help="Chemin vers un fichier texte au format annexe (N / M / durées / zones)")
     parser.add_argument("--aleatoire",  nargs=2,  metavar=("M", "N"), type=int,
                         help="Génère une instance aléatoire (M zones, N capteurs)")
     parser.add_argument("--clavier",    action="store_true", help="Saisie au clavier")
@@ -63,7 +65,11 @@ def main():
         return
 
     # Chargement de l'instance
-    if args.fichier:
+    fichier_txt = getattr(args, "fichier_txt", None)
+    if fichier_txt:
+        print(f"Chargement depuis {fichier_txt} (format texte)...")
+        instance = lire_depuis_fichier_texte(fichier_txt)
+    elif args.fichier:
         print(f"Chargement depuis {args.fichier}...")
         instance = lire_depuis_fichier(args.fichier)
     elif args.aleatoire:

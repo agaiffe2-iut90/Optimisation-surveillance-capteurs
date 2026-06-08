@@ -32,7 +32,37 @@ class Instance:
         print()
 
 
+def lire_depuis_fichier_texte(chemin):
+    """
+    Lit une instance depuis un fichier texte au format annexe :
+
+        N                        ← nombre de capteurs
+        M                        ← nombre de zones
+        T1 T2 ... TN             ← durées de vie (séparées par espaces)
+        z1 z2 ...                ← zones couvertes par capteur 1 (1-indexed)
+        z1 z2 ...                ← zones couvertes par capteur 2
+        ...                      ← (N lignes au total)
+
+    Les numéros de zones dans le fichier sont 1-indexed (zone 1 = indice 0).
+    """
+    with open(chemin, "r") as f:
+        lignes = [l.strip() for l in f if l.strip()]  # ignore lignes vides
+
+    N = int(lignes[0])
+    M = int(lignes[1])
+    durees_vie = list(map(float, lignes[2].split()))
+
+    zones_par_capteur = []
+    for i in range(N):
+        zones_1indexed = list(map(int, lignes[3 + i].split()))
+        zones_0indexed = set(z - 1 for z in zones_1indexed)  # conversion 1-based → 0-based
+        zones_par_capteur.append(zones_0indexed)
+
+    return Instance(M, N, zones_par_capteur, durees_vie)
+
+
 def lire_depuis_fichier(chemin):
+
     """
     Lit une instance depuis un fichier JSON.
 
