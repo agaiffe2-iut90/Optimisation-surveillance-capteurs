@@ -151,10 +151,27 @@ def afficher_solution(instance, solution):
     methode = solution["methode"]
     duree   = solution["duree_vie"]
 
-    print(f"=== Solution (solveur : {methode.upper()}) ===")
-    print(f"Durée de vie optimale du réseau : {duree:.4f} unités de temps\n")
+    nb_actives = sum(1 for t in temps.values() if t > 1e-9)
+    nb_epuises = 0
+    
+    for i in range(instance.N):
+        configs_avec_i = [k for k, c in enumerate(configs) if i in c]
+        energie = sum(temps.get(k, 0.0) for k in configs_avec_i)
+        if (instance.T[i] - energie) < 1e-6:
+            nb_epuises += 1
 
-    print("Activité des configurations :")
+    print("\n" + "="*55)
+    print("--- RÉSUMÉ ---")
+    print(f"Configurations générées (total) : {len(configs)}")
+    print(f"Configurations actives (>0)     : {nb_actives}")
+    print(f"Durée de vie optimale           : {duree:.4f} u.t.")
+    print(f"Capteurs épuisés                : {nb_epuises}/{instance.N}")
+    print("="*55 + "\n")
+
+    # --- AFFICHAGE DÉTAILLÉ CLASSIQUE ---
+    print(f"=== Détail de la Solution (solveur : {methode.upper()}) ===")
+    
+    print("Activité des configurations (seules les actives sont affichées) :")
     for k, c in enumerate(configs):
         t = temps.get(k, 0.0)
         if t > 1e-9:
