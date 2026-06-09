@@ -87,7 +87,7 @@ Voisin            = remplacer Ci par Cj  (une nouvelle config)
 Valeur            = durée de vie donnée par le LP
 
 Algorithme :
-  1. Générer une solution initiale (greedy)
+  1. Générer une solution initiale (glouton aléatoire)
   2. Explorer des voisins (tirage aléatoire dans le voisinage)
   3. Aller au meilleur voisin si il améliore la valeur courante
   4. Répéter jusqu'à ce qu'aucun voisin n'améliore → OPTIMUM LOCAL

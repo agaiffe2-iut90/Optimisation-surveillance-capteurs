@@ -88,7 +88,7 @@ def descente(instance, configs_initiales=None, nb_voisins=15,
     Retourne : (meilleure_valeur, meilleures_configs, historique_valeurs)
     """
     if configs_initiales is None:
-        configs_initiales = generer_configurations(instance, methode="greedy_aleatoire")
+        configs_initiales = generer_configurations(instance, methode="glouton_aleatoire")
 
     pool = generer_pool(instance, taille=max(200, instance.N * 5))
     pool = list(set(pool) | set(configs_initiales))
@@ -151,7 +151,7 @@ def tabou(instance, configs_initiales=None, nb_voisins=20, max_iter=200,
     Retourne : (meilleure_valeur, meilleures_configs, historique_valeurs)
     """
     if configs_initiales is None:
-        configs_initiales = generer_configurations(instance, methode="greedy_aleatoire")
+        configs_initiales = generer_configurations(instance, methode="glouton_aleatoire")
 
     pool = generer_pool(instance, taille=max(200, instance.N * 5))
     pool = list(set(pool) | set(configs_initiales))
@@ -230,22 +230,22 @@ def tabou(instance, configs_initiales=None, nb_voisins=20, max_iter=200,
 
 def comparer_methodes(instance, nb_runs=3, verbose=True):
     """
-    Compare greedy / descente / tabou sur la même instance.
+    Compare glouton / descente / tabou sur la même instance.
     Effectue nb_runs exécutions pour chaque méthode (résultats aléatoires).
     """
     print("\n" + "=" * 55)
     print("  Comparaison des méthodes")
     print("=" * 55)
 
-    # ── Greedy de référence ──
-    configs_ref = generer_configurations(instance, methode="greedy_aleatoire")
-    val_greedy = evaluer(instance, configs_ref)
-    print(f"\n  Greedy (référence)   : {val_greedy:.4f}  ({len(configs_ref)} configs)")
+    # ── Glouton de référence ──
+    configs_ref = generer_configurations(instance, methode="glouton_aleatoire")
+    val_glouton = evaluer(instance, configs_ref)
+    print(f"\n  Glouton (référence)  : {val_glouton:.4f}  ({len(configs_ref)} configs)")
 
     # ── Descente ──
     val_descente = 0.0
     for run in range(nb_runs):
-        ci = generer_configurations(instance, methode="greedy_aleatoire",
+        ci = generer_configurations(instance, methode="glouton_aleatoire",
                                     seed=random.randint(0, 9999))
         v, _, _ = descente(instance, configs_initiales=ci,
                            nb_voisins=15, max_iter=80, verbose=False)
@@ -255,7 +255,7 @@ def comparer_methodes(instance, nb_runs=3, verbose=True):
     # ── Tabou ──
     val_tabou = 0.0
     for run in range(nb_runs):
-        ci = generer_configurations(instance, methode="greedy_aleatoire",
+        ci = generer_configurations(instance, methode="glouton_aleatoire",
                                     seed=random.randint(0, 9999))
         v, _, _ = tabou(instance, configs_initiales=ci,
                         nb_voisins=20, max_iter=150, tenure=10, verbose=False)
@@ -263,7 +263,7 @@ def comparer_methodes(instance, nb_runs=3, verbose=True):
     print(f"  Tabou   (best/{nb_runs})   : {val_tabou:.4f}")
 
     print("\n" + "=" * 55)
-    if val_tabou > val_greedy:
-        gain = (val_tabou - val_greedy) / val_greedy * 100
-        print(f"  Gain tabou vs greedy : +{gain:.2f}%")
-    return val_greedy, val_descente, val_tabou
+    if val_tabou > val_glouton:
+        gain = (val_tabou - val_glouton) / val_glouton * 100
+        print(f"  Gain tabou vs glouton : +{gain:.2f}%")
+    return val_glouton, val_descente, val_tabou

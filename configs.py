@@ -6,8 +6,8 @@ Une configuration est ÉLÉMENTAIRE si elle est minimale : retirer n'importe que
 capteur laisse au moins une zone non couverte.
 
 Trois heuristiques proposées :
-  1. Greedy aléatoire   - construction gloutonne avec tirage aléatoire
-  2. Greedy trié        - construction gloutonne triée par couverture décroissante
+  1. Glouton aléatoire  - construction gloutonne avec tirage aléatoire
+  2. Glouton trié       - construction gloutonne triée par couverture décroissante
   3. Enum backtracking  - énumération exhaustive (toutes les configs élémentaires)
 """
 
@@ -49,9 +49,9 @@ def reduire_en_elementaire(config, instance):
     return frozenset(config)
 
 
-# ── Heuristique 1 : Greedy aléatoire ────────────────────────────────────────
+# ── Heuristique 1 : Glouton aléatoire ───────────────────────────────────────
 
-def heuristique_greedy_aleatoire(instance, nb_configs=None, seed=None):
+def heuristique_glouton_aleatoire(instance, nb_configs=None, seed=None):
     """
     Construit des configurations en ajoutant des capteurs tirés aléatoirement
     jusqu'à couvrir toutes les zones, puis réduit en config élémentaire.
@@ -87,12 +87,12 @@ def heuristique_greedy_aleatoire(instance, nb_configs=None, seed=None):
     return list(configs)
 
 
-# ── Heuristique 2 : Greedy trié par couverture ──────────────────────────────
+# ── Heuristique 2 : Glouton trié par couverture ─────────────────────────────
 
-def heuristique_greedy_trie(instance, nb_configs=None):
+def heuristique_glouton_trie(instance, nb_configs=None):
     """
     Construit des configurations en ajoutant les capteurs selon leur apport
-    marginal décroissant à chaque étape (greedy déterministe avec perturbation).
+    marginal décroissant à chaque étape (glouton déterministe avec perturbation).
 
     Avantage  : configs de petite taille (proches du minimum)
     Inconvénient : peu diversifiées sans perturbation
@@ -171,20 +171,20 @@ def heuristique_enumeration(instance, limite=200):
 
 # ── Interface principale ─────────────────────────────────────────────────────
 
-def generer_configurations(instance, methode="greedy_aleatoire", nb_configs=None, seed=42):
+def generer_configurations(instance, methode="glouton_aleatoire", nb_configs=None, seed=42):
     """
-    methode : "greedy_aleatoire" | "greedy_trie" | "enumeration" | "toutes"
+    methode : "glouton_aleatoire" | "glouton_trie" | "enumeration" | "toutes"
     Retourne une liste de frozensets (indices capteurs 0-based).
     """
-    if methode == "greedy_aleatoire":
-        configs = heuristique_greedy_aleatoire(instance, nb_configs, seed=seed)
-    elif methode == "greedy_trie":
-        configs = heuristique_greedy_trie(instance, nb_configs)
+    if methode == "glouton_aleatoire":
+        configs = heuristique_glouton_aleatoire(instance, nb_configs, seed=seed)
+    elif methode == "glouton_trie":
+        configs = heuristique_glouton_trie(instance, nb_configs)
     elif methode == "enumeration":
         configs = heuristique_enumeration(instance)
     elif methode == "toutes":
-        c1 = set(map(frozenset, heuristique_greedy_aleatoire(instance, nb_configs, seed=seed)))
-        c2 = set(map(frozenset, heuristique_greedy_trie(instance, nb_configs)))
+        c1 = set(map(frozenset, heuristique_glouton_aleatoire(instance, nb_configs, seed=seed)))
+        c2 = set(map(frozenset, heuristique_glouton_trie(instance, nb_configs)))
         c3 = set(map(frozenset, heuristique_enumeration(instance)))
         configs = list(c1 | c2 | c3)
     else:

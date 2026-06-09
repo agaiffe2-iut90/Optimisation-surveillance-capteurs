@@ -20,16 +20,16 @@ from configs import generer_configurations, afficher_configurations
 from solver import resoudre, afficher_solution
 
 
-METHODES = ["greedy_aleatoire", "greedy_trie", "enumeration"]
+METHODES = ["glouton_aleatoire", "glouton_trie", "enumeration"]
 LABELS    = {
-    "greedy_aleatoire": "Greedy aléatoire",
-    "greedy_trie"     : "Greedy trié",
-    "enumeration"     : "Énumération",
+    "glouton_aleatoire": "Glouton aléatoire",
+    "glouton_trie"     : "Glouton trié",
+    "enumeration"      : "Énumération",
 }
 COULEURS  = {
-    "greedy_aleatoire": "#4C72B0",
-    "greedy_trie"     : "#DD8452",
-    "enumeration"     : "#55A868",
+    "glouton_aleatoire": "#4C72B0",
+    "glouton_trie"     : "#DD8452",
+    "enumeration"      : "#55A868",
 }
 INSTANCES_DIR = os.path.join(os.path.dirname(__file__), "instances")
 GRAPHIQUES_DIR = os.path.dirname(__file__)
@@ -200,19 +200,19 @@ def _comparer_methodes(instance, nom_instance):
 
 def _comparer_nb_configs(instance, nom_instance, nb_list=None):
     """
-    Pour les heuristiques greedy, montre l'influence du nombre
+    Pour les heuristiques gloutonnes, montre l'influence du nombre
     de configs générées sur la durée de vie.
     """
     if nb_list is None:
         nb_list = [2, 5, 10, 20, 50]
 
-    print(f"\n  Influence du nombre de configs (greedy aléatoire) :")
+    print(f"\n  Influence du nombre de configs (glouton aléatoire) :")
     print(f"  {'Nb configs demandé':>22} {'Nb obtenus':>12} {'Durée de vie':>14}")
     print("  " + "-" * 50)
 
     resultats = []
     for nb in nb_list:
-        configs = generer_configurations(instance, methode="greedy_aleatoire",
+        configs = generer_configurations(instance, methode="glouton_aleatoire",
                                          nb_configs=nb, seed=0)
         if not configs:
             continue
@@ -280,7 +280,7 @@ def _graphique_comparaison_methodes(tableau):
 def _graphique_influence_nb_configs(tableau):
     """
     Graphique en lignes : pour chaque instance, évolution de la durée de vie
-    en fonction du nombre de configurations générées (greedy aléatoire).
+    en fonction du nombre de configurations générées (glouton aléatoire).
     """
     _style_global()
 
@@ -290,7 +290,7 @@ def _graphique_influence_nb_configs(tableau):
                "#cba6f7", "#94e2d5", "#f9e2af"]
 
     fig, ax = plt.subplots(figsize=(9, 5))
-    fig.suptitle("Partie 5 — Influence du nombre de configurations (greedy aléatoire)",
+    fig.suptitle("Partie 5 — Influence du nombre de configurations (glouton aléatoire)",
                  fontsize=13, fontweight="bold", y=0.98)
 
     for idx, nom in enumerate(noms_instances):

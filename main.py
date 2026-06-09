@@ -2,12 +2,12 @@
 main.py - Point d'entrée du projet surveillance par capteurs
 
 Usage :
-  python main.py                                  → résout l'exemple du sujet (greedy + LP)
-  python main.py --fichier-txt inst.txt --tabou   → résolution par recherche tabou
+  python main.py                                   → résout l'exemple du sujet (glouton + LP)
+  python main.py --fichier-txt inst.txt --tabou    → résolution par recherche tabou
   python main.py --fichier-txt inst.txt --descente → résolution par descente
-  python main.py --fichier-txt inst.txt --comparer → compare greedy / descente / tabou
-  python main.py --aleatoire 5 8                  → instance aléatoire (5 zones, 8 capteurs)
-  python main.py --experiences                    → expériences Parties 4 & 5
+  python main.py --fichier-txt inst.txt --comparer → compare glouton / descente / tabou
+  python main.py --aleatoire 5 8                   → instance aléatoire (5 zones, 8 capteurs)
+  python main.py --experiences                     → expériences Parties 4 & 5
 """
 
 import argparse
@@ -23,7 +23,7 @@ from tabou import descente, tabou, comparer_methodes
 
 # ── Résolution d'une instance avec une méthode donnée ────────────────────────
 
-def resoudre_instance(instance, methode="greedy_aleatoire", nb_configs=None, verbose=True):
+def resoudre_instance(instance, methode="glouton_aleatoire", nb_configs=None, verbose=True):
     instance.afficher()
     configs = generer_configurations(instance, methode=methode, nb_configs=nb_configs)
     if not configs:
@@ -49,11 +49,11 @@ def parse_args():
     parser.add_argument("--aleatoire",  nargs=2,  metavar=("M", "N"), type=int,
                         help="Génère une instance aléatoire (M zones, N capteurs)")
     parser.add_argument("--clavier",    action="store_true", help="Saisie au clavier")
-    parser.add_argument("--methode",    type=str, default="greedy_aleatoire",
-                        choices=["greedy_aleatoire", "greedy_trie", "enumeration", "toutes"],
-                        help="Heuristique de génération des configurations (greedy)")
+    parser.add_argument("--methode",    type=str, default="glouton_aleatoire",
+                        choices=["glouton_aleatoire", "glouton_trie", "enumeration", "toutes"],
+                        help="Heuristique de génération des configurations")
     parser.add_argument("--nb-configs", type=int, default=None,
-                        help="Nombre de configurations à générer (heuristiques greedy)")
+                        help="Nombre de configurations à générer (heuristiques gloutonnes)")
     parser.add_argument("--experiences", action="store_true",
                         help="Lance les expériences comparatives (Parties 4 & 5)")
     # ── Méthodes de recherche locale ──
@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument("--tabou",      action="store_true",
                         help="Résolution par recherche tabou")
     parser.add_argument("--comparer",   action="store_true",
-                        help="Compare greedy / descente / tabou sur l'instance")
+                        help="Compare glouton / descente / tabou sur l'instance")
     parser.add_argument("--tenure",     type=int, default=10,
                         help="Durée de vie d'un mouvement tabou (défaut: 10)")
     parser.add_argument("--max-iter",   type=int, default=200,
@@ -128,7 +128,7 @@ def main():
         print(f"\n→ Durée de vie (descente) : {val:.4f} unités de temps")
 
     else:
-        # Par défaut : greedy + LP
+        # Par défaut : glouton + LP
         resoudre_instance(instance, methode=args.methode, nb_configs=args.nb_configs)
 
 

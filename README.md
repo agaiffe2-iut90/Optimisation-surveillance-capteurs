@@ -129,11 +129,11 @@ Le programme demande le nombre de zones, de capteurs, puis les zones couvertes e
 ### 5. Choisir la méthode de génération de configurations
 
 ```bash
-# Greedy aléatoire (défaut)
-python3 main.py --methode greedy_aleatoire
+# Glouton aléatoire (défaut)
+python3 main.py --methode glouton_aleatoire
 
-# Greedy trié par couverture décroissante
-python3 main.py --methode greedy_trie
+# Glouton trié par couverture décroissante
+python3 main.py --methode glouton_trie
 
 # Énumération exhaustive (toutes les configs élémentaires)
 python3 main.py --methode enumeration
@@ -142,10 +142,10 @@ python3 main.py --methode enumeration
 python3 main.py --methode toutes
 ```
 
-Contrôle du nombre de configurations générées (pour les méthodes greedy) :
+Contrôle du nombre de configurations générées (pour les méthodes gloutonnes) :
 
 ```bash
-python3 main.py --methode greedy_aleatoire --nb-configs 20
+python3 main.py --methode glouton_aleatoire --nb-configs 20
 ```
 
 ---
@@ -165,14 +165,14 @@ Cela exécute :
 ### Combinaisons d'options
 
 ```bash
-# Instance fichier + méthode greedy trié
-python3 main.py --fichier instances/instance3.json --methode greedy_trie
+# Instance fichier + méthode glouton trié
+python3 main.py --fichier instances/instance3.json --methode glouton_trie
 
 # Instance aléatoire + énumération
 python3 main.py --aleatoire 4 6 --methode enumeration
 
 # Fichier + nombre de configs personnalisé
-python3 main.py --fichier instances/instance2.json --methode greedy_aleatoire --nb-configs 30
+python3 main.py --fichier instances/instance2.json --methode glouton_aleatoire --nb-configs 30
 ```
 
 ---
@@ -208,14 +208,14 @@ python3 main.py --fichier instances/instance2.json --methode greedy_aleatoire --
 
 ## Heuristiques implémentées
 
-### Heuristique 1 — Greedy aléatoire
-Construit des configurations en ajoutant des capteurs dans un ordre aléatoire (seulement ceux qui apportent de nouvelles zones), puis réduit la configuration en configuration élémentaire. Répète jusqu'à obtenir `nb_configs` configurations distinctes.
+### Heuristique 1 — Glouton aléatoire
+Construit des configurations en ajoutant des capteurs dans un ordre **aléatoire** (seulement ceux qui apportent de nouvelles zones), puis réduit la configuration en configuration élémentaire. Répète jusqu'à obtenir `nb_configs` configurations distinctes.
 
 - ✅ Diversité garantie
 - ⚠️ Peut produire des doublons sur des petites instances
 
-### Heuristique 2 — Greedy trié
-À chaque étape, sélectionne le capteur qui couvre le maximum de zones non encore couvertes. Applique une perturbation aléatoire pour diversifier les résultats.
+### Heuristique 2 — Glouton trié
+À chaque étape, sélectionne le capteur qui couvre le **maximum de zones non encore couvertes**. Applique une perturbation aléatoire pour diversifier les résultats.
 
 - ✅ Configurations de petite taille (proches du minimum)
 - ⚠️ Moins diversifiée sans perturbation
@@ -245,8 +245,8 @@ Explore toutes les combinaisons de capteurs par backtracking avec élagage : on 
 | `couvre_tout(config, instance)` | Vérifie la couverture complète |
 | `est_elementaire(config, instance)` | Vérifie la minimalité |
 | `reduire_en_elementaire(config, instance)` | Réduit une config valide en élémentaire |
-| `heuristique_greedy_aleatoire(...)` | Heuristique 1 |
-| `heuristique_greedy_trie(...)` | Heuristique 2 |
+| `heuristique_glouton_aleatoire(...)` | Heuristique 1 — glouton aléatoire |
+| `heuristique_glouton_trie(...)` | Heuristique 2 — glouton trié |
 | `heuristique_enumeration(...)` | Heuristique 3 — exhaustive |
 | `generer_configurations(instance, methode, ...)` | Interface principale |
 | `afficher_configurations(configs, instance)` | Affichage formaté |
