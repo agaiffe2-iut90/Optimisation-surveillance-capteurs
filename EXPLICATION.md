@@ -68,99 +68,64 @@ Tour 3 :            [u3={s2,s4}]   (pas utilisé ici)
 
 ---
 
-## 4. Pourquoi la qualité des configs est importante ?
+## 4. Les deux heuristiques pour générer les configurations
 
-Si on génère de "mauvaises" configs (peu diversifiées), le LP ne peut pas bien répartir les durées de vie.  
-De "bonnes" configs exploitent mieux les batteries complémentaires.
+### Heuristique 1 — Glouton aléatoire
 
-**C'est là qu'interviennent les méthodes de recherche locale.**
+On tire les capteurs dans un **ordre aléatoire** et on n'ajoute un capteur que
+s'il couvre au moins une zone nouvelle. On répète cela plusieurs fois pour obtenir
+des configs variées.
+
+```
+Répéter K fois :
+  1. Mélanger les capteurs dans un ordre aléatoire
+  2. Parcourir l'ordre : ajouter le capteur seulement s'il apporte de nouvelles zones
+  3. Réduire la config obtenue pour la rendre élémentaire (retirer les capteurs superflus)
+```
+
+✅ Avantage : configurations très diversifiées  
+⚠️ Inconvénient : peut rater certaines bonnes combinaisons
+
+### Heuristique 2 — Glouton trié (intelligent)
+
+À chaque étape, on choisit le capteur qui couvre le **maximum de zones non encore couvertes**.
+
+```
+Répéter K fois (avec une légère perturbation aléatoire) :
+  1. Tant qu'il reste des zones à couvrir :
+       - Choisir le capteur qui couvre le plus de zones restantes
+       - L'ajouter à la configuration
+  2. Réduire en configuration élémentaire
+```
+
+✅ Avantage : configurations de petite taille, proches du minimum  
+⚠️ Inconvénient : moins diversifiées
 
 ---
 
-## 5. Méthode de descente (hill climbing)
-
-**Idée** : partir d'un ensemble de configs, essayer des voisins, prendre le meilleur.
-
-```
-Solution courante = {C1, C2, C3, ...}    (ensemble de configs)
-Voisin            = remplacer Ci par Cj  (une nouvelle config)
-Valeur            = durée de vie donnée par le LP
-
-Algorithme :
-  1. Générer une solution initiale (glouton aléatoire)
-  2. Explorer des voisins (tirage aléatoire dans le voisinage)
-  3. Aller au meilleur voisin si il améliore la valeur courante
-  4. Répéter jusqu'à ce qu'aucun voisin n'améliore → OPTIMUM LOCAL
-```
-
-**Problème** : on peut se retrouver bloqué dans un optimum local.
-
----
-
-## 6. Recherche tabou
-
-**Idée** : comme la descente, mais on se SOUVIENT des derniers mouvements
-pour ne pas revenir en arrière. On peut alors traverser des zones moins bonnes.
-
-```
-Liste tabou = mémoire des K derniers mouvements interdits
-
-Algorithme :
-  1. Générer une solution initiale
-  2. Explorer des voisins
-  3. Prendre le MEILLEUR voisin non-tabou
-     (même si ce voisin est moins bon que la solution courante !)
-  4. Ajouter le mouvement effectué à la liste tabou
-  5. Critère d'aspiration : si un mouvement tabou donne le meilleur résultat GLOBAL, l'accepter quand même
-  6. Répéter jusqu'à max_iter ou patience épuisée
-```
-
-**Avantage** : on peut sortir des optima locaux car on accepte des dégradations temporaires.
-
-### Illustration
-
-```
-Valeur
-  ↑
-  |        ★ meilleure solution trouvée
-  |       /
-  |      / ← tabou permet de descendre puis remonter
-  |  /\/
-  |/
-  +------------------→ Itérations
-   Descente s'arrête ici
-```
-
----
-
-## 7. Voisinage utilisé dans notre implémentation
-
-**Swap de configuration** :  
-Retirer une config de l'ensemble courant, en ajouter une nouvelle (depuis un pool pré-généré).
-
-```
-Avant : {C1, C2, C3, C4}
-Après : {C1, C2, C4, C_nouvelle}   ← C3 retirée, C_nouvelle ajoutée
-```
-
-La config retirée est mise en **tabou** pendant `tenure` itérations.
-
-**Aspiration** : si même le meilleur mouvement tabou dépasse la meilleure valeur globale, on l'accepte.
-
----
-
-## 8. Utilisation en ligne de commande
+## 5. Utilisation en ligne de commande
 
 ```bash
-# Méthode de descente sur un fichier
-python main.py --fichier-txt instances/instance_moyen.txt --descente
+# Exemple du sujet (par défaut)
+python main.py
 
-# Recherche tabou sur un fichier
-python main.py --fichier-txt instances/instance_moyen.txt --tabou
+# Saisie manuelle au clavier
+python main.py --clavier
 
-# Comparer toutes les méthodes
-python main.py --fichier-txt instances/instance_moyen.txt --comparer
+# Depuis un fichier texte
+python main.py --fichier-txt instances/instance_moyen.txt
 
-# Paramètres tabou personnalisés
-python main.py --fichier-txt instances/instance_moyen.txt --tabou --tenure 15 --max-iter 300
+# Instance aléatoire (5 zones, 8 capteurs)
+python main.py --aleatoire 5 8
+
+# Changer la méthode de génération
+python main.py --fichier-txt instances/instance_moyen.txt --methode glouton_trie
+python main.py --fichier-txt instances/instance_moyen.txt --methode enumeration
+python main.py --fichier-txt instances/instance_moyen.txt --methode toutes
+
+# Contrôler le nombre de configurations générées
+python main.py --fichier-txt instances/instance_moyen.txt --nb-configs 30
+
+# Lancer les expériences (Parties 4 & 5)
+python main.py --experiences
 ```
