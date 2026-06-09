@@ -2,11 +2,12 @@
 main.py - Point d'entrée du projet surveillance par capteurs
 
 Usage :
-  python main.py                        → résout l'exemple du sujet
-  python main.py --fichier mon_inst.json → charge une instance depuis un fichier
-  python main.py --aleatoire 5 8        → instance aléatoire (5 zones, 8 capteurs)
-  python main.py --clavier              → saisie interactive
-  python main.py --experiences          → lance toutes les expériences (Parties 4 & 5)
+  python main.py                                  → résout l'exemple du sujet (greedy + LP)
+  python main.py --fichier-txt inst.txt --tabou   → résolution par recherche tabou
+  python main.py --fichier-txt inst.txt --descente → résolution par descente
+  python main.py --fichier-txt inst.txt --comparer → compare greedy / descente / tabou
+  python main.py --aleatoire 5 8                  → instance aléatoire (5 zones, 8 capteurs)
+  python main.py --experiences                    → expériences Parties 4 & 5
 """
 
 import argparse
@@ -17,6 +18,7 @@ from data import instance_exemple, lire_depuis_fichier, lire_depuis_fichier_text
 from configs import generer_configurations, afficher_configurations
 from solver import resoudre, afficher_solution
 from experiences import lancer_experiences
+from tabou import descente, tabou, comparer_methodes
 
 
 # ── Résolution d'une instance avec une méthode donnée ────────────────────────
@@ -49,11 +51,24 @@ def parse_args():
     parser.add_argument("--clavier",    action="store_true", help="Saisie au clavier")
     parser.add_argument("--methode",    type=str, default="greedy_aleatoire",
                         choices=["greedy_aleatoire", "greedy_trie", "enumeration", "toutes"],
-                        help="Heuristique de génération des configurations")
+                        help="Heuristique de génération des configurations (greedy)")
     parser.add_argument("--nb-configs", type=int, default=None,
-                        help="Nombre de configurations à générer (heuristiques 1 & 2)")
+                        help="Nombre de configurations à générer (heuristiques greedy)")
     parser.add_argument("--experiences", action="store_true",
                         help="Lance les expériences comparatives (Parties 4 & 5)")
+    # ── Méthodes de recherche locale ──
+    parser.add_argument("--descente",   action="store_true",
+                        help="Résolution par méthode de descente (hill climbing)")
+    parser.add_argument("--tabou",      action="store_true",
+                        help="Résolution par recherche tabou")
+    parser.add_argument("--comparer",   action="store_true",
+                        help="Compare greedy / descente / tabou sur l'instance")
+    parser.add_argument("--tenure",     type=int, default=10,
+                        help="Durée de vie d'un mouvement tabou (défaut: 10)")
+    parser.add_argument("--max-iter",   type=int, default=200,
+                        help="Nombre max d'itérations pour tabou/descente (défaut: 200)")
+    parser.add_argument("--nb-voisins", type=int, default=20,
+                        help="Taille du voisinage exploré à chaque itération (défaut: 20)")
     return parser.parse_args()
 
 
@@ -64,7 +79,7 @@ def main():
         lancer_experiences()
         return
 
-    # Chargement de l'instance
+    # ── Chargement de l'instance ──────────────────────────────────────────────
     fichier_txt = getattr(args, "fichier_txt", None)
     if fichier_txt:
         print(f"Chargement depuis {fichier_txt} (format texte)...")
@@ -83,7 +98,38 @@ def main():
         print("=== Instance de l'exemple du sujet ===\n")
         instance = instance_exemple()
 
-    resoudre_instance(instance, methode=args.methode, nb_configs=args.nb_configs)
+    # ── Sélection de la méthode ───────────────────────────────────────────────
+    max_iter = getattr(args, "max_iter", 200)
+    nb_voisins = getattr(args, "nb_voisins", 20)
+
+    if args.comparer:
+        instance.afficher()
+        comparer_methodes(instance, nb_runs=3)
+
+    elif args.tabou:
+        instance.afficher()
+        val, configs, _ = tabou(
+            instance,
+            nb_voisins=nb_voisins,
+            max_iter=max_iter,
+            tenure=args.tenure,
+            verbose=True,
+        )
+        print(f"\n→ Durée de vie (tabou) : {val:.4f} unités de temps")
+
+    elif args.descente:
+        instance.afficher()
+        val, configs, _ = descente(
+            instance,
+            nb_voisins=nb_voisins,
+            max_iter=max_iter,
+            verbose=True,
+        )
+        print(f"\n→ Durée de vie (descente) : {val:.4f} unités de temps")
+
+    else:
+        # Par défaut : greedy + LP
+        resoudre_instance(instance, methode=args.methode, nb_configs=args.nb_configs)
 
 
 if __name__ == "__main__":
