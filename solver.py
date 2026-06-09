@@ -160,8 +160,11 @@ def afficher_solution(instance, solution):
         if (instance.T[i] - energie) < 1e-6:
             nb_epuises += 1
 
+# --- AFFICHAGE ---
     print("\n" + "="*55)
     print("--- RÉSUMÉ ---")
+    print(f"Zones (M)                       : {instance.M}")
+    print(f"Capteurs (N)                    : {instance.N}")
     print(f"Configurations générées (total) : {len(configs)}")
     print(f"Configurations actives (>0)     : {nb_actives}")
     print(f"Durée de vie optimale           : {duree:.4f} u.t.")
