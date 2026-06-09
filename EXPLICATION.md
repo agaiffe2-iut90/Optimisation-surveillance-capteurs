@@ -106,25 +106,20 @@ Répéter K fois (avec une légère perturbation aléatoire) :
 ## 5. Utilisation en ligne de commande
 
 ```bash
-# Exemple du sujet (par défaut)
+# Exemple du sujet (par défaut, glouton aléatoire)
 python main.py
 
 # Saisie manuelle au clavier
 python main.py --clavier
 
-# Depuis un fichier texte
+# Depuis un fichier texte (glouton aléatoire par défaut)
 python main.py --fichier-txt instances/instance_moyen.txt
 
-# Instance aléatoire (5 zones, 8 capteurs)
-python main.py --aleatoire 5 8
-
-# Changer la méthode de génération
+# Utiliser le glouton trié à la place
 python main.py --fichier-txt instances/instance_moyen.txt --methode glouton_trie
-python main.py --fichier-txt instances/instance_moyen.txt --methode enumeration
-python main.py --fichier-txt instances/instance_moyen.txt --methode toutes
 
-# Contrôler le nombre de configurations générées
-python main.py --fichier-txt instances/instance_moyen.txt --nb-configs 30
+# Combiner les deux méthodes (plus de configurations = meilleur résultat potentiel)
+python main.py --fichier-txt instances/instance_moyen.txt --methode toutes
 
 # Lancer les expériences (Parties 4 & 5)
 python main.py --experiences

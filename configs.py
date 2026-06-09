@@ -5,10 +5,9 @@ Une configuration est un ensemble de capteurs qui couvre toutes les zones.
 Une configuration est ÉLÉMENTAIRE si elle est minimale : retirer n'importe quel
 capteur laisse au moins une zone non couverte.
 
-Trois heuristiques proposées :
+Deux heuristiques proposées :
   1. Glouton aléatoire  - construction gloutonne avec tirage aléatoire
   2. Glouton trié       - construction gloutonne triée par couverture décroissante
-  3. Enum backtracking  - énumération exhaustive (toutes les configs élémentaires)
 """
 
 import random
@@ -136,57 +135,21 @@ def heuristique_glouton_trie(instance, nb_configs=None):
     return list(configs)
 
 
-# ── Heuristique 3 : Énumération exhaustive ──────────────────────────────────
-
-def heuristique_enumeration(instance, limite=200):
-    """
-    Énumère toutes les configurations élémentaires par backtracking.
-    Garantit l'optimalité de l'ensemble de configs mais coûteux pour N grand.
-
-    Paramètre limite : nombre max de configs retournées (pour éviter explosion)
-    """
-    toutes = []
-    N = instance.N
-    M = instance.M
-    zones_list = instance.zones
-
-    def backtrack(start, config_courante, zones_couvertes):
-        if zones_couvertes == set(range(M)):
-            c = frozenset(config_courante)
-            if est_elementaire(c, instance):
-                toutes.append(c)
-            return
-        if len(toutes) >= limite:
-            return
-        for i in range(start, N):
-            apport = zones_list[i] - zones_couvertes
-            if apport:  # élagage : inutile d'ajouter un capteur sans apport
-                config_courante.append(i)
-                backtrack(i + 1, config_courante, zones_couvertes | zones_list[i])
-                config_courante.pop()
-
-    backtrack(0, [], set())
-    return toutes
-
-
-# ── Interface principale ─────────────────────────────────────────────────────
+# ── Interface principale ───────────────────────────────────────────────
 
 def generer_configurations(instance, methode="glouton_aleatoire", nb_configs=None, seed=42):
     """
-    methode : "glouton_aleatoire" | "glouton_trie" | "enumeration" | "toutes"
+    methode : "glouton_aleatoire" | "glouton_trie" | "toutes"
     Retourne une liste de frozensets (indices capteurs 0-based).
     """
     if methode == "glouton_aleatoire":
         configs = heuristique_glouton_aleatoire(instance, nb_configs, seed=seed)
     elif methode == "glouton_trie":
         configs = heuristique_glouton_trie(instance, nb_configs)
-    elif methode == "enumeration":
-        configs = heuristique_enumeration(instance)
     elif methode == "toutes":
         c1 = set(map(frozenset, heuristique_glouton_aleatoire(instance, nb_configs, seed=seed)))
         c2 = set(map(frozenset, heuristique_glouton_trie(instance, nb_configs)))
-        c3 = set(map(frozenset, heuristique_enumeration(instance)))
-        configs = list(c1 | c2 | c3)
+        configs = list(c1 | c2)
     else:
         raise ValueError(f"Méthode inconnue : {methode}")
 

@@ -136,10 +136,7 @@ python3 main.py --methode glouton_aleatoire
 # Glouton trié par couverture décroissante
 python3 main.py --methode glouton_trie
 
-# Énumération exhaustive (toutes les configs élémentaires)
-python3 main.py --methode enumeration
-
-# Combiner toutes les méthodes
+# Combiner les deux méthodes
 python3 main.py --methode toutes
 ```
 
@@ -216,12 +213,6 @@ Construit des configurations en ajoutant des capteurs dans un ordre **aléatoire
 - ✅ Configurations de petite taille (proches du minimum)
 - ⚠️ Moins diversifiée sans perturbation
 
-### Heuristique 3 — Énumération exhaustive (backtracking)
-Explore toutes les combinaisons de capteurs par backtracking avec élagage : on n'ajoute un capteur que s'il couvre au moins une zone nouvelle. Vérifie la minimalité de chaque configuration trouvée.
-
-- ✅ Garantit toutes les configurations élémentaires
-- ⚠️ Exponentiel en N — limité à 200 résultats par défaut
-
 ---
 
 ## Description des fichiers
@@ -243,7 +234,6 @@ Explore toutes les combinaisons de capteurs par backtracking avec élagage : on 
 | `reduire_en_elementaire(config, instance)` | Réduit une config valide en élémentaire |
 | `heuristique_glouton_aleatoire(...)` | Heuristique 1 — glouton aléatoire |
 | `heuristique_glouton_trie(...)` | Heuristique 2 — glouton trié |
-| `heuristique_enumeration(...)` | Heuristique 3 — exhaustive |
 | `generer_configurations(instance, methode, ...)` | Interface principale |
 | `afficher_configurations(configs, instance)` | Affichage formaté |
 

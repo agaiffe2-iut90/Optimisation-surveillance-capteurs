@@ -19,16 +19,14 @@ from configs import generer_configurations, afficher_configurations
 from solver import resoudre, afficher_solution
 
 
-METHODES = ["glouton_aleatoire", "glouton_trie", "enumeration"]
+METHODES = ["glouton_aleatoire", "glouton_trie"]
 LABELS    = {
     "glouton_aleatoire": "Glouton aléatoire",
     "glouton_trie"     : "Glouton trié",
-    "enumeration"      : "Énumération",
 }
 COULEURS  = {
     "glouton_aleatoire": "#4C72B0",
     "glouton_trie"     : "#DD8452",
-    "enumeration"      : "#55A868",
 }
 INSTANCES_DIR = os.path.join(os.path.dirname(__file__), "instances")
 GRAPHIQUES_DIR = os.path.dirname(__file__)
@@ -76,7 +74,7 @@ def partie4(instances):
     for nom, inst in instances.items():
         print(f"\n--- Instance : {nom} ---")
         inst.afficher()
-        configs = generer_configurations(inst, methode="enumeration")
+        configs = generer_configurations(inst, methode="toutes")
         if not configs:
             print("Aucune configuration trouvée.\n")
             continue
@@ -314,11 +312,6 @@ def _graphique_influence_nb_configs(tableau):
 
 def lancer_experiences():
     instances = {"exemple_sujet": instance_exemple()}
-
-    # Instances aléatoires
-    instances["aleatoire_5z_6c"]  = generer_aleatoire(5, 6,  seed=1)
-    instances["aleatoire_4z_8c"]  = generer_aleatoire(4, 8,  seed=2)
-    instances["aleatoire_6z_10c"] = generer_aleatoire(6, 10, seed=3)
 
     partie4(instances)
     partie5(instances)
