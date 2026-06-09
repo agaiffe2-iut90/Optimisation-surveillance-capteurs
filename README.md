@@ -39,18 +39,19 @@ s.c.  Σ{k : i ∈ cₖ} tₖ ≤ Tᵢ   ∀ capteur i
 ```
 optimisation/
 │
-├── main.py            # Point d'entrée — interface CLI complète
+├── main.py            # Point d'entrée — interface CLI
 ├── data.py            # Classe Instance + lecture/génération des données
-├── configs.py         # Génération de configurations élémentaires (3 heuristiques)
-├── solver.py          # Écriture du .lp et résolution via PuLP (GLPK/HiGHS/CBC)
-├── experiences.py     # Parties 4 & 5 : expériences comparatives + graphiques
+├── configs.py         # Génération de configurations élémentaires
+├── solver.py          # Écriture du .lp et résolution via PuLP
+├── experiences.py     # Parties 4 & 5 : expériences + graphiques
 │
 ├── instances/
-│   ├── instance1_sujet.json   # Exemple exact du sujet (3 zones, 4 capteurs)
-│   ├── instance2.json         # Instance 2 (4 zones, 5 capteurs)
-│   └── instance3.json         # Instance 3 (5 zones, 7 capteurs)
+│   ├── instance_moyen.txt    # Instance moyenne (10 capteurs, 10 zones)
+│   ├── moyen_test_2.txt      # Instance moyenne (20 capteurs, 10 zones)
+│   ├── gros_test_1.txt       # Grande instance
+│   └── maxi_test_1.txt       # Très grande instance
 │
-└── projet-plcapteurs-2024.pdf # Sujet original
+└── projet-plcapteurs-2024.pdf  # Sujet original
 ```
 
 ---
@@ -96,12 +97,12 @@ Affiche l'instance, les configurations élémentaires trouvées, et la solution 
 
 ---
 
-### 2. Charger une instance depuis un fichier JSON
+### 2. Charger une instance depuis un fichier texte
 
 ```bash
-python3 main.py --fichier instances/instance1_sujet.json
-python3 main.py --fichier instances/instance2.json
-python3 main.py --fichier instances/instance3.json
+python3 main.py --fichier-txt instances/instance_moyen.txt
+python3 main.py --fichier-txt instances/moyen_test_2.txt
+python3 main.py --fichier-txt instances/gros_test_1.txt
 ```
 
 ---
@@ -142,7 +143,7 @@ python3 main.py --methode enumeration
 python3 main.py --methode toutes
 ```
 
-Contrôle du nombre de configurations générées (pour les méthodes gloutonnes) :
+Contrôle du nombre de configurations générées :
 
 ```bash
 python3 main.py --methode glouton_aleatoire --nb-configs 20
@@ -157,52 +158,47 @@ python3 main.py --experiences
 ```
 
 Cela exécute :
-- **Partie 4** : résolution sur toutes les instances (sujet + fichiers JSON + aléatoires) avec tableau récapitulatif
-- **Partie 5** : comparaison des 3 heuristiques + influence du nombre de configurations, avec génération de **graphiques** sauvegardés en `.png`
+- **Partie 4** : résolution sur l'exemple du sujet + instances aléatoires, tableau récapitulatif
+- **Partie 5** : comparaison des heuristiques + influence du nombre de configurations, **graphiques** `.png`
 
 ---
 
 ### Combinaisons d'options
 
 ```bash
-# Instance fichier + méthode glouton trié
-python3 main.py --fichier instances/instance3.json --methode glouton_trie
+# Fichier texte + méthode glouton trié
+python3 main.py --fichier-txt instances/instance_moyen.txt --methode glouton_trie
 
 # Instance aléatoire + énumération
 python3 main.py --aleatoire 4 6 --methode enumeration
 
 # Fichier + nombre de configs personnalisé
-python3 main.py --fichier instances/instance2.json --methode glouton_aleatoire --nb-configs 30
+python3 main.py --fichier-txt instances/moyen_test_2.txt --methode glouton_aleatoire --nb-configs 30
 ```
 
 ---
 
 ## Instances de test
 
-### Format JSON
+### Format du fichier texte
 
-```json
-{
-    "nb_zones": 3,
-    "nb_capteurs": 4,
-    "capteurs": [
-        {"zones": [0, 1], "duree_vie": 6},
-        {"zones": [1, 2], "duree_vie": 3},
-        {"zones": [2],    "duree_vie": 2},
-        {"zones": [0, 2], "duree_vie": 6}
-    ]
-}
 ```
-
-> Les indices de zones sont **0-based** (zone 1 du sujet = indice 0).
+N                   ← nombre de capteurs
+M                   ← nombre de zones
+T1 T2 ... TN        ← durées de vie (séparées par espaces)
+z1 z2 ...           ← zones couvertes par capteur 1 (numérotées à partir de 1)
+z1 z2 ...           ← zones couvertes par capteur 2
+...                 ← (N lignes au total)
+```
 
 ### Instances disponibles
 
-| Fichier | Zones | Capteurs | Solution optimale (énumération) |
+| Fichier | Capteurs | Zones | Résultat |
 |---|---|---|---|
-| `instance1_sujet.json` | 3 | 4 | **8.5** unités de temps |
-| `instance2.json` | 4 | 5 | À calculer |
-| `instance3.json` | 5 | 7 | À calculer |
+| `instance_moyen.txt` | 10 | 10 | **395** unités de temps |
+| `moyen_test_2.txt` | 20 | 10 | **104** unités de temps |
+| `gros_test_1.txt` | — | — | **2290** unités de temps |
+| `maxi_test_1.txt` | 1000 | 500 | **17173** unités de temps |
 
 ---
 
@@ -234,7 +230,7 @@ Explore toutes les combinaisons de capteurs par backtracking avec élagage : on 
 | Fonction / Classe | Rôle |
 |---|---|
 | `Instance` | Classe encapsulant les données (M, N, zones, durées de vie) |
-| `lire_depuis_fichier(chemin)` | Lecture d'une instance JSON |
+| `lire_depuis_fichier_texte(chemin)` | Lecture d'une instance depuis un fichier texte |
 | `saisir_au_clavier()` | Saisie interactive |
 | `generer_aleatoire(M, N, ...)` | Génération aléatoire reproductible (seed) |
 | `instance_exemple()` | Instance de l'exemple exact du sujet |
@@ -262,7 +258,6 @@ Explore toutes les combinaisons de capteurs par backtracking avec élagage : on 
 ### `experiences.py`
 | Fonction | Rôle |
 |---|---|
-| `charger_instances()` | Charge tous les JSON du dossier `instances/` |
 | `partie4(instances)` | Résout toutes les instances, tableau récapitulatif |
 | `partie5(instances)` | Comparaison heuristiques + influence nb_configs + graphiques |
 | `lancer_experiences()` | Point d'entrée des Parties 4 & 5 |

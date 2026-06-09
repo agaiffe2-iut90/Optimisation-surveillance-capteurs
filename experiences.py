@@ -6,7 +6,6 @@ Partie 5 : Influence du nombre et type de configs sur la durée de vie
            → génère des graphiques .png dans le dossier courant
 """
 
-import json
 import os
 
 import matplotlib
@@ -15,7 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 
-from data import lire_depuis_fichier, instance_exemple, generer_aleatoire
+from data import instance_exemple, generer_aleatoire
 from configs import generer_configurations, afficher_configurations
 from solver import resoudre, afficher_solution
 
@@ -66,19 +65,6 @@ def _style_global():
 
 
 # ── Partie 4 : instances fixes ────────────────────────────────────────────────
-
-def charger_instances():
-    """Charge toutes les instances JSON du dossier instances/."""
-    instances = {}
-    if not os.path.isdir(INSTANCES_DIR):
-        return instances
-    for fname in sorted(os.listdir(INSTANCES_DIR)):
-        if fname.endswith(".json"):
-            chemin = os.path.join(INSTANCES_DIR, fname)
-            nom = fname.replace(".json", "")
-            instances[nom] = lire_depuis_fichier(chemin)
-    return instances
-
 
 def partie4(instances):
     """Résout chaque instance avec l'énumération et affiche les résultats."""
@@ -329,10 +315,7 @@ def _graphique_influence_nb_configs(tableau):
 def lancer_experiences():
     instances = {"exemple_sujet": instance_exemple()}
 
-    # Ajout des instances JSON si présentes
-    instances.update(charger_instances())
-
-    # Instances aléatoires supplémentaires
+    # Instances aléatoires
     instances["aleatoire_5z_6c"]  = generer_aleatoire(5, 6,  seed=1)
     instances["aleatoire_4z_8c"]  = generer_aleatoire(4, 8,  seed=2)
     instances["aleatoire_6z_10c"] = generer_aleatoire(6, 10, seed=3)

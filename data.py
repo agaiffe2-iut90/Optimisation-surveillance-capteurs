@@ -2,7 +2,6 @@
 data.py - Gestion des données du problème de surveillance par capteurs
 """
 
-import json
 import random
 
 
@@ -60,32 +59,6 @@ def lire_depuis_fichier_texte(chemin):
 
     return Instance(M, N, zones_par_capteur, durees_vie)
 
-
-def lire_depuis_fichier(chemin):
-
-    """
-    Lit une instance depuis un fichier JSON.
-
-    Format attendu :
-    {
-        "nb_zones": 3,
-        "nb_capteurs": 4,
-        "capteurs": [
-            {"zones": [0, 1], "duree_vie": 6},
-            {"zones": [1, 2], "duree_vie": 3},
-            ...
-        ]
-    }
-    """
-    with open(chemin, "r") as f:
-        data = json.load(f)
-
-    nb_zones = data["nb_zones"]
-    nb_capteurs = data["nb_capteurs"]
-    zones_par_capteur = [set(c["zones"]) for c in data["capteurs"]]
-    durees_vie = [c["duree_vie"] for c in data["capteurs"]]
-
-    return Instance(nb_zones, nb_capteurs, zones_par_capteur, durees_vie)
 
 
 def saisir_au_clavier():
